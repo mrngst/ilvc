@@ -386,7 +386,7 @@
         
         function onScanSuccess(decodedText, decodedResult) {
             if (!isScanning) return;
-            
+            alert(decodedText);
             console.log('QR Code detected:', decodedText);
             
             // Pausar temporalmente el scanner
