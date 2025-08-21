@@ -230,7 +230,7 @@
         </div>
         
         <div class="controls">
-            <button id="startBtn" class="btn">📷 Iniciar Cámara</button>
+            <button id="startBtn" class="btn" onclick="startQR(){">📷 Iniciar Cámara</button>
             <button id="stopBtn" class="btn" disabled>⏹️ Detener</button>
         </div>
         
@@ -269,13 +269,20 @@
         statusDiv.className = 'status success';
         });
       };
-
+    function startQR(){
       const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-      html5QrCode.start(
+
+                statusDiv.textContent = "";
+        statusDiv.className = 'status';
+
+        html5QrCode.start(
         { facingMode: "environment" },
         config,
         qrCodeSuccessCallback
       );
+    }
+
+        startQR();
     </script>
   </body>
 </html>
