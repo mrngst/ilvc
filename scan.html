@@ -266,6 +266,7 @@
         html5QrCode.stop().then((ignore) => {
           console.log("QR Code scanning stopped.");
         statusDiv.textContent = "Escaner detenido >> " + decodedText;
+        statusDiv.className = 'status success';
         });
       };
 
