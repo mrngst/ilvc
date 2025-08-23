@@ -55,6 +55,8 @@
       try {
         const res = await fetch(apiUrl + '?code=' + encodeURIComponent(code));
         const data = await res.json();
+        console.log(res);
+        console.log(data);
         if (data.success) {
           resultDiv.innerHTML = `
             <div class='nombre'>Nombre asociado: ${data.nombre}</div>
