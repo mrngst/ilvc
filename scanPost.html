@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Validar Ticket QR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: 'Roboto', sans-serif; background: #f6fafd; margin: 0; color:#222; }
+    #container { max-width: 435px; margin: 40px auto; padding: 24px; background: #fff; border-radius: 16px; box-shadow: 0 4px 14px #aaa;}
+    #qr-reader { width: 100%; min-height: 260px; }
+    .nombre { font-size: 1.25em; font-weight: bold; margin:18px 0 10px;}
+    .error { color: #ea2330; font-size: 1.1em; margin-top:14px;}
+    #scan-again { display: none; margin-top: 20px; padding: 12px 28px; background: #0051be; color: #fff; border-radius: 9px; border: none; cursor:pointer;}
+    @media(max-width: 500px) { #container {max-width:100%;padding:8px;} }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <h2>Escanea tu Ticket QR</h2>
+    <div id="qr-reader"></div>
+    <div id="result"></div>
+    <button id="scan-again">Escanear otro</button>
+  </div>
+  <script src="https://unpkg.com/html5-qrcode@latest/html5-qrcode.min.js"></script>
+  <script>
+    const apiUrl = "https://script.google.com/macros/s/AKfycbwIllP5yBJ3DWnQrY-4LOfED6_6m2tdMNXmJwIEwJj3xgZfPDNLPRqFEAJRUm79SCbplA/exec"; // Pon aquí la URL pública del Web App de Google Apps Script
+    const resultDiv = document.getElementById('result');
+    const scanAgainBtn = document.getElementById('scan-again');
+    let html5QrCode;
+
+    function startScanner() {
+      resultDiv.innerHTML = '';
+      scanAgainBtn.style.display = 'none';
+      html5QrCode = new Html5Qrcode("qr-reader");
+      html5QrCode.start(
+        { facingMode: "environment" }, 
+        { fps: 10, qrbox: 230 },
+        code => {
+          html5QrCode.stop();
+          consultarTicket(code);
+        },
+        errorMsg => {}
+      );
+      scanAgainBtn.onclick = () => {
+        html5QrCode.clear();
+        startScanner();
+      };
+    }
+
+    async function consultarTicket(code) {
+      resultDiv.innerHTML = "Buscando ticket...";
+      try {
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: code })
+        });
+        const data = await res.json();
+        if (data.success) {
+          resultDiv.innerHTML = `<div class='nombre'>Nombre asociado: ${data.nombre}</div>`;
+          scanAgainBtn.style.display = 'block';
+        } else {
+          resultDiv.innerHTML = `<div class='error'>${data.message}</div>`;
+          scanAgainBtn.style.display = 'block';
+        }
+      } catch (err) {
+        resultDiv.innerHTML = `<div class='error'>Error al consultar ticket</div>`;
+        scanAgainBtn.style.display = 'block';
+      }
+    }
+
+    startScanner();
+  </script>
+</body>
+</html>
